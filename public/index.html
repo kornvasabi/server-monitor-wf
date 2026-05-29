@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Monitor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Server Monitor Dashboard</h1>
+            <p class="text-slate-400">Real-time server performance monitoring</p>
+        </header>
+
+        <!-- Server Selection -->
+        <div class="card rounded-lg p-4 mb-6">
+            <label for="serverSelect" class="block text-sm font-medium text-slate-300 mb-2">Select Server</label>
+            <select id="serverSelect" class="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Loading servers...</option>
+            </select>
+        </div>
+
+        <!-- Status Indicators -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- CPU Status -->
+            <div class="card rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-white">CPU Usage</h2>
+                    <span id="cpuStatus" class="px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">Normal</span>
+                </div>
+                <div class="text-5xl font-bold text-white mb-2" id="cpuValue">--%</div>
+                <div class="text-slate-400 text-sm">Load Average: <span id="loadAvg">--</span></div>
+            </div>
+
+            <!-- RAM Status -->
+            <div class="card rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-white">RAM Usage</h2>
+                    <span id="ramStatus" class="px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">Normal</span>
+                </div>
+                <div class="text-5xl font-bold text-white mb-2" id="ramValue">--%</div>
+                <div class="text-slate-400 text-sm"><span id="ramUsed">--</span> GB / <span id="ramTotal">--</span> GB</div>
+            </div>
+
+            <!-- Disk Status -->
+            <div class="card rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-white">Disk Usage</h2>
+                    <span id="diskStatus" class="px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">Normal</span>
+                </div>
+                <div class="text-5xl font-bold text-white mb-2" id="diskValue">--%</div>
+                <div class="text-slate-400 text-sm">Primary Mount: <span id="diskMount">--</span></div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- CPU Chart -->
+            <div class="card rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-white mb-4">CPU Usage History</h2>
+                <div class="relative h-64">
+                    <canvas id="cpuChart"></canvas>
+                </div>
+            </div>
+
+            <!-- RAM Chart -->
+            <div class="card rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-white mb-4">RAM Usage History</h2>
+                <div class="relative h-64">
+                    <canvas id="ramChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disk Progress Bars -->
+        <div class="card rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-white mb-4">Disk Space Usage</h2>
+            <div id="diskProgressBars" class="space-y-4">
+                <p class="text-slate-400">Loading disk information...</p>
+            </div>
+        </div>
+
+        <!-- Service Status -->
+        <div class="card rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold text-white mb-4">Service Status</h2>
+            <div id="serviceStatus" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-slate-400">Loading service information...</p>
+            </div>
+        </div>
+
+        <!-- Time Range Selector -->
+        <div class="card rounded-lg p-4 mt-6">
+            <label for="timeRange" class="block text-sm font-medium text-slate-300 mb-2">Time Range</label>
+            <div class="flex gap-2">
+                <button onclick="changeTimeRange(1)" class="time-range-btn px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition" data-hours="1">1 Hour</button>
+                <button onclick="changeTimeRange(6)" class="time-range-btn px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-600 transition" data-hours="6">6 Hours</button>
+                <button onclick="changeTimeRange(24)" class="time-range-btn px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-600 transition" data-hours="24">24 Hours</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-slate-500 text-sm">
+            <p>Last updated: <span id="lastUpdated">--</span></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
