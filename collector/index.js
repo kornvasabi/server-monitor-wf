@@ -1,8 +1,9 @@
+require('dotenv').config();
 const { testConnection } = require('../database/db');
 const { getServerId, collectAllMetrics } = require('./metrics');
 
 // Configuration
-const COLLECTION_INTERVAL = 5000; // 5 seconds
+const COLLECTION_INTERVAL = parseInt(process.env.COLLECTION_INTERVAL) || 5000; // 5 seconds
 
 // Main collector function
 async function startCollector() {

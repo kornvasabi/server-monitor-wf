@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -19,7 +20,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // Configuration
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT) || 3000;
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL) || 5000;
 
 // Middleware
 app.use(express.json());
@@ -150,8 +152,7 @@ async function pollAndBroadcastMetrics() {
     }
 }
 
-// Start polling for metrics (every 5 seconds)
-const POLL_INTERVAL = 5000;
+// Start polling for metrics
 setInterval(pollAndBroadcastMetrics, POLL_INTERVAL);
 
 // Export broadcast function for use by collector
