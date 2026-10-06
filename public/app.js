@@ -176,12 +176,15 @@ function joinServerRoom(serverId) {
 
 // Load historical data
 async function loadHistoricalData(serverId) {
+    console.log('loadHistoricalData called with serverId:', serverId, 'and currentTimeRange:', currentTimeRange);
     if (!serverId) return;
     
     try {
         // Fetch CPU history
+        console.log(`Fetching CPU data: /api/metrics/cpu/${serverId}?hours=${currentTimeRange}`);
         const cpuResponse = await fetch(`/api/metrics/cpu/${serverId}?hours=${currentTimeRange}`);
         const cpuData = await cpuResponse.json();
+        console.log('CPU data received:', cpuData.length, 'records');
         
         // Fetch RAM history
         const ramResponse = await fetch(`/api/metrics/ram/${serverId}?hours=${currentTimeRange}`);
@@ -422,7 +425,9 @@ function formatTime(timestamp) {
 
 // Change time range
 function changeTimeRange(hours) {
+    console.log('changeTimeRange called with hours:', hours);
     currentTimeRange = hours;
+    console.log('currentTimeRange updated to:', currentTimeRange);
     
     // Update button styles
     document.querySelectorAll('.time-range-btn').forEach(btn => {
@@ -436,8 +441,12 @@ function changeTimeRange(hours) {
     });
     
     // Reload data
+    console.log('currentServerId:', currentServerId);
     if (currentServerId) {
+        console.log('Calling loadHistoricalData with serverId:', currentServerId);
         loadHistoricalData(currentServerId);
+    } else {
+        console.log('No server selected, skipping data reload');
     }
 }
 
